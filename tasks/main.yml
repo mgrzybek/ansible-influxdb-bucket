@@ -1,0 +1,25 @@
+---
+# tasks file for ansible-influxdb-bucket
+
+- name: Variables by OS
+  include_vars: "{{ item }}"
+  tags: always
+  with_first_found:
+    - "{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+    - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+    - "{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+
+- import_tasks: influxdb_bucket_pre_install.yml
+  tags:
+    - influxdb_bucket-pre-install
+
+- import_tasks: influxdb_bucket_install.yml
+  tags:
+    - influxdb_bucket-install
+
+- include_tasks: influxdb_bucket_post_install.yml
+  with_items: "{{ influxdb_buckets }}"
+  tags:
+    - influxdb_bucket-post-install

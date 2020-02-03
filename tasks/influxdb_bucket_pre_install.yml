@@ -1,0 +1,44 @@
+---
+
+- name: Pre-install | Ping InfluxDB
+  register: influxdb_ping
+  uri:
+    url: "{{ influxdb_conf.endpoint }}/api/v2/ping"
+    method: GET
+    body_format: json
+    status_code: 200
+    headers:
+        Authorization: "Token {{ influxdb_conf.token }}"
+
+- name: Pre-install | Set local facts
+  set_fact:
+      buckets_endpoint: "{{ influxdb_conf.endpoint }}{{ influxdb_ping.json.buckets }}"
+      authorizations_endpoint: "{{ influxdb_conf.endpoint }}{{ influxdb_ping.json.authorizations }}"
+      orgs_endpoint: "{{ influxdb_conf.endpoint }}{{ influxdb_ping.json.orgs }}"
+
+- name: Pre-install | Get existing orgs
+  register: orgs_ws_result
+  uri:
+    url: "{{ orgs_endpoint }}"
+    method: GET
+    body_format: json
+    status_code: 200
+    headers:
+        Authorization: "Token {{ influxdb_conf.token }}"
+
+- name: Pre-install | Get existing buckets
+  register: buckets_ws_result
+  uri:
+    url: "{{ buckets_endpoint }}"
+    method: GET
+    body_format: json
+    status_code: 200
+    headers:
+        Authorization: "Token {{ influxdb_conf.token }}"
+
+- name: Pre-install | Set local facts
+  set_fact:
+      buckets: "{{ buckets_ws_result.json.buckets }}"
+      orgs: "{{ orgs_ws_result.json.orgs }}"
+
+#- name: Test if tokens_output_file is writtable
