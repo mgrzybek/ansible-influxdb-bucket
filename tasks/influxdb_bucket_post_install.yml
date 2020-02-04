@@ -44,7 +44,7 @@
         }'
 
     - name: Post-install | Set local fact
-      set_fact: bucket_id="{{ bucket_info.json.id }}"
+      set_fact: bucket_id="{{ bucket_info.json.id | join }}"
 
 - name: Post-install | Get bucket-ID
   when: item.name in buckets | json_query('[*].name')
@@ -81,7 +81,7 @@
                 - action: read
                   resource:
                       type: authorizations
-                      id: "{{ bucket_id[0] }}"
+                      id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
                       orgID: "{{ org_id[0] }}"
             status: "active"
@@ -116,7 +116,7 @@
                 - action: write
                   resource:
                       type: authorizations
-                      id: "{{ bucket_id[0] }}"
+                      id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
                       orgID: "{{ org_id[0] }}"
             status: "active"
