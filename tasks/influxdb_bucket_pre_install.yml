@@ -1,5 +1,9 @@
 ---
 
+- name: Pre-install | Check token
+  when: influxdb_api.token == None or influxdb_api.token | length != 88
+  fail: msg="influxdb_api.token must be valid"
+
 - name: Pre-install | Ping InfluxDB
   register: influxdb_ping
   uri:
