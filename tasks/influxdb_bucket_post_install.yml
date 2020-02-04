@@ -29,7 +29,7 @@
         status_code: 201
         body: "{{ bucket_body }}"
         headers:
-            Authorization: "Token {{ influxdb_conf.token }}"
+            Authorization: "Token {{ influxdb_api.token }}"
       vars:
         bucket_body: '{
             "description": "{{ item.description | default() }}",
@@ -64,7 +64,7 @@
         status_code: 201
         body: "{{ auth_body | to_json }}"
         headers:
-            Authorization: "Token {{ influxdb_conf.token }}"
+            Authorization: "Token {{ influxdb_api.token }}"
       vars:
         auth_body:
             description: "Read-only token for {{ item.org }} / {{ item.name }}"
@@ -80,7 +80,7 @@
 
     - name: Write the token to file
       lineinfile:
-          path: "{{ influxdb_conf.tokens_output_file }}"
+          path: "{{ influxdb_api.tokens_output_file }}"
           state: present
           regexp: '^{{ item.org }},{{ item.name }},read,'
           line: '{{ item.org }},{{ item.name }},read,{{ auth_info.json.token }}'
@@ -97,7 +97,7 @@
         status_code: 201
         body: "{{ auth_body | to_json }}"
         headers:
-            Authorization: "Token {{ influxdb_conf.token }}"
+            Authorization: "Token {{ influxdb_api.token }}"
       vars:
         auth_body:
             description: "Write-only token for {{ item.org }} / {{ item.name }}"
@@ -113,7 +113,7 @@
 
     - name: Write the token to file
       lineinfile:
-          path: "{{ influxdb_conf.tokens_output_file }}"
+          path: "{{ influxdb_api.tokens_output_file }}"
           state: present
           regexp: '^{{ item.org }},{{ item.name }},write,'
           line: '{{ item.org }},{{ item.name }},write,{{ auth_info.json.token }}'

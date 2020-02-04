@@ -26,7 +26,7 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - role: ansible-influxdb-bucket
       vars:
-         influxdb_conf:
+         influxdb_api:
              token: secret
              endpoint: http://localhost:8086
              tokens_output_file: ~/.influxdb_tokens
