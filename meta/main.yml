@@ -31,7 +31,10 @@ galaxy_info:
   #
   # platforms is a list of platforms, and each platform has a name and a list of versions.
   #
-  # platforms:
+  platforms:
+    - name: Ubuntu
+      versions:
+       - 18.04
   # - name: Fedora
   #   versions:
   #   - all
