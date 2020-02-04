@@ -56,7 +56,7 @@
   when: item.create_read_token is defined and item.create_read_token | lower == 'true' or item.create_write_token is defined and item.create_write_token | lower == 'true'
   copy:
     dest: "{{ influxdb_api.tokens_output_file }}"
-    copy: ''
+    content: ''
 
 - name: Post-install | Get read-only token
   when:
