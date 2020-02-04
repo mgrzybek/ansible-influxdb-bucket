@@ -52,6 +52,12 @@
   vars:
       query: "[?name=='{{ item.name }}'].id"
 
+- name: Post-install | Create the tokens file
+  when: item.create_read_token is defined and item.create_read_token | lower == 'true' or item.create_write_token is defined and item.create_write_token | lower == 'true'
+  copy:
+    dest: "{{ influxdb_api.tokens_output_file }}"
+    copy: ''
+
 - name: Post-install | Get read-only token
   when:
     - item.create_read_token is defined
@@ -80,7 +86,7 @@
                       orgID: "{{ org_id[0] }}"
             status: "active"
 
-    - name: Write the token to file
+    - name: Post-install | Write the token to file
       lineinfile:
           path: "{{ influxdb_api.tokens_output_file }}"
           state: present
@@ -115,10 +121,7 @@
                       orgID: "{{ org_id[0] }}"
             status: "active"
 
-    - name: Create the tokens file
-      file: path={{ influxdb_api.tokens_output_file }} state=file
-
-    - name: Write the token to file
+    - name: Post-install | Write the token to file
       lineinfile:
           path: "{{ influxdb_api.tokens_output_file }}"
           state: present
