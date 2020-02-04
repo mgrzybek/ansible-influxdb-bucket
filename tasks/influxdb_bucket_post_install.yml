@@ -115,6 +115,9 @@
                       orgID: "{{ org_id[0] }}"
             status: "active"
 
+    - name: Create the tokens file
+      file: path={{ influxdb_api.tokens_output_file }} state=present
+
     - name: Write the token to file
       lineinfile:
           path: "{{ influxdb_api.tokens_output_file }}"
