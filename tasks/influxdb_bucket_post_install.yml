@@ -48,7 +48,7 @@
 
 - name: Post-install | Get bucket-ID
   when: item.name in buckets | json_query('[*].name')
-  set_fact: bucket_id="{{ buckets | json_query(query) }}"
+  set_fact: bucket_id="{{ buckets | json_query(query) | join }}"
   vars:
       query: "[?name=='{{ item.name }}'].id"
 
