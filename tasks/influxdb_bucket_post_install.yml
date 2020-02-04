@@ -116,7 +116,7 @@
             status: "active"
 
     - name: Create the tokens file
-      file: path={{ influxdb_api.tokens_output_file }} state=present
+      file: path={{ influxdb_api.tokens_output_file }} state=file
 
     - name: Write the token to file
       lineinfile:
