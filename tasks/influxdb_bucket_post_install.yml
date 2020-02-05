@@ -74,7 +74,7 @@
             permissions:
                 - action: read
                   resource:
-                      type: authorizations
+                      type: buckets
                       id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
                       orgID: "{{ org_id[0] }}"
@@ -109,7 +109,7 @@
             permissions:
                 - action: write
                   resource:
-                      type: authorizations
+                      type: buckets
                       id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
                       orgID: "{{ org_id[0] }}"
