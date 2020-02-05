@@ -2,11 +2,11 @@
 
 - name: Post-install | Get org-ID (1)
   when: item.org in orgs | json_query('[*].id')
-  set_fact: org_id="{{ item.org }}"
+  set_fact: org_id="{{ item.org | join }}"
 
 - name: Post-install | Get org-ID (2)
   when: item.org not in orgs | json_query('[*].id')
-  set_fact: org_id="{{ orgs | json_query(query) }}"
+  set_fact: org_id="{{ orgs | json_query(query) | join }}"
   vars:
       query: "[?name=='{{ item.org }}'].id"
 
@@ -34,7 +34,7 @@
         bucket_body: '{
             "description": "{{ item.description | default() }}",
             "name": "{{ item.name }}",
-            "orgID": "{{ org_id[0] }}",
+            "orgID": "{{ org_id }}",
             "retentionRules": [
                 {
                     "type": "expire",
@@ -70,14 +70,14 @@
       vars:
         auth_body:
             description: "Read-only token for {{ item.org }} / {{ item.name }}"
-            orgID: "{{ org_id[0] }}"
+            orgID: "{{ org_id }}"
             permissions:
                 - action: read
                   resource:
                       type: buckets
                       id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
-                      orgID: "{{ org_id[0] }}"
+                      orgID: "{{ org_id }}"
             status: "active"
 
     - name: Post-install | Write the token to file
@@ -105,14 +105,14 @@
       vars:
         auth_body:
             description: "Write-only token for {{ item.org }} / {{ item.name }}"
-            orgID: "{{ org_id[0] }}"
+            orgID: "{{ org_id }}"
             permissions:
                 - action: write
                   resource:
                       type: buckets
                       id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
-                      orgID: "{{ org_id[0] }}"
+                      orgID: "{{ org_id }}"
             status: "active"
 
     - name: Post-install | Write the token to file
