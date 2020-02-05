@@ -43,20 +43,14 @@
             ]
         }'
 
-    - name: Post-install | Set local fact
-      set_fact: bucket_id="{{ bucket_info.json.id }}"
-
-- name: Post-install | Get bucket-ID
+    - name: Post-install | Retreive bucket ID from creation result
+      set_fact: bucket_id="{{ bucket_info.json.id | join }}"
+        
+- name: Post-install | Retreive bucket ID from buckets fact
   when: item.name in buckets | json_query('[*].name')
   set_fact: bucket_id="{{ buckets | json_query(query) | join }}"
   vars:
       query: "[?name=='{{ item.name }}'].id"
-
-- name: Post-install | Create the tokens file
-  when: item.create_read_token is defined and item.create_read_token | lower == 'true' or item.create_write_token is defined and item.create_write_token | lower == 'true'
-  copy:
-    dest: "{{ influxdb_api.tokens_output_file }}"
-    content: ''
 
 - name: Post-install | Get read-only token
   when:
@@ -81,7 +75,7 @@
                 - action: read
                   resource:
                       type: authorizations
-                      id: "{{ bucket_id[0] }}"
+                      id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
                       orgID: "{{ org_id[0] }}"
             status: "active"
@@ -116,7 +110,7 @@
                 - action: write
                   resource:
                       type: authorizations
-                      id: "{{ bucket_id[0] }}"
+                      id: "{{ bucket_id }}"
                       name: "{{ item.name }}"
                       orgID: "{{ org_id[0] }}"
             status: "active"
