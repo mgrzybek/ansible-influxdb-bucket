@@ -45,7 +45,7 @@
 
     - name: Post-install | Retreive bucket ID from creation result
       set_fact: bucket_id="{{ bucket_info.json.id | join }}"
-        
+
 - name: Post-install | Retreive bucket ID from buckets fact
   when: item.name in buckets | json_query('[*].name')
   set_fact: bucket_id="{{ buckets | json_query(query) | join }}"
