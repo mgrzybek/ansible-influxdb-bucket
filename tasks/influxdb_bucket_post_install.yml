@@ -1,5 +1,4 @@
 ---
-
 - name: Post-install | Get org-ID (1)
   when: item.org in orgs | json_query('[*].id')
   set_fact: org_id="{{ item.org | join }}"
@@ -21,7 +20,6 @@
       set_fact: retention_seconds={{ item.retention_hours  | int * 12960000 }}
 
     - name: Post-install | Create the bucket
-      register: bucket_info
       uri:
         url: "{{ buckets_endpoint }}"
         method: POST
@@ -42,6 +40,9 @@
                 }
             ]
         }'
+      environment:
+        no_proxy: "{{ buckets_endpoint | urlsplit('hostname') }}"
+      register: bucket_info
 
     - name: Post-install | Retreive bucket ID from creation result
       set_fact: bucket_id="{{ bucket_info.json.id | join }}"
@@ -58,7 +59,6 @@
     - item.create_read_token | lower == 'true'
   block:
     - name: Post-install | Create read-only token
-      register: auth_info
       uri:
         url: "{{ authorizations_endpoint }}"
         method: POST
@@ -79,6 +79,9 @@
                       name: "{{ item.name }}"
                       orgID: "{{ org_id }}"
             status: "active"
+      environment:
+        no_proxy: "{{ authorizations_endpoint | urlsplit('hostname') }}"
+      register: auth_info
 
     - name: Post-install | Write the token to file
       lineinfile:
@@ -93,7 +96,6 @@
     - item.create_write_token | lower == 'true'
   block:
     - name: Post-install | Create write-only token
-      register: auth_info
       uri:
         url: "{{ authorizations_endpoint }}"
         method: POST
@@ -114,6 +116,9 @@
                       name: "{{ item.name }}"
                       orgID: "{{ org_id }}"
             status: "active"
+      environment:
+        no_proxy: "{{ authorizations_endpoint | urlsplit('hostname') }}"
+      register: auth_info
 
     - name: Post-install | Write the token to file
       lineinfile:
@@ -121,3 +126,4 @@
           state: present
           regexp: '^{{ item.org }},{{ item.name }},write,'
           line: '{{ item.org }},{{ item.name }},write,{{ auth_info.json.token }}'
+...
