@@ -1,11 +1,9 @@
 ---
-
 - name: Pre-install | Check token
   when: influxdb_api.token == None or influxdb_api.token | length != 88
   fail: msg="influxdb_api.token must be valid, given value is '{{ influxdb_api.token }}'"
 
 - name: Pre-install | Ping InfluxDB
-  register: influxdb_ping
   uri:
     url: "{{ influxdb_api.endpoint }}/api/v2/ping"
     method: GET
@@ -13,6 +11,9 @@
     status_code: 200
     headers:
         Authorization: "Token {{ influxdb_api.token }}"
+  environment:
+    no_proxy: "{{ influxdb_api.endpoint | urlsplit('hostname') }}"
+  register: influxdb_ping
 
 - name: Pre-install | Set local facts
   set_fact:
@@ -21,7 +22,6 @@
       orgs_endpoint: "{{ influxdb_api.endpoint }}{{ influxdb_ping.json.orgs }}"
 
 - name: Pre-install | Get existing orgs
-  register: orgs_ws_result
   uri:
     url: "{{ orgs_endpoint }}"
     method: GET
@@ -29,9 +29,11 @@
     status_code: 200
     headers:
         Authorization: "Token {{ influxdb_api.token }}"
+  environment:
+    no_proxy: "{{ orgs_endpoint | urlsplit('hostname') }}"
+  register: orgs_ws_result
 
 - name: Pre-install | Get existing buckets
-  register: buckets_ws_result
   uri:
     url: "{{ buckets_endpoint }}"
     method: GET
@@ -39,10 +41,12 @@
     status_code: 200
     headers:
         Authorization: "Token {{ influxdb_api.token }}"
+  environment:
+    no_proxy: "{{ buckets_endpoint | urlsplit('hostname') }}"
+  register: buckets_ws_result
 
 - name: Pre-install | Set local facts
   set_fact:
       buckets: "{{ buckets_ws_result.json.buckets }}"
       orgs: "{{ orgs_ws_result.json.orgs }}"
-
-#- name: Test if tokens_output_file is writtable
+...
